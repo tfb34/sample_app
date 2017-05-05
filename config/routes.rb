@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'users/new'
+
   #get 'users/new'
   get '/signup', to: 'users#new' #use signup_path everywhere else
 
