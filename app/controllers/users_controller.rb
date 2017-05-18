@@ -11,12 +11,15 @@ class UsersController < ApplicationController
   def create
   	@user = User.new(user_params)
   	if @user.save
+      log_in @user
       flash[:success] = "Welcome to the Sample App!" #local
       redirect_to @user
   	else
   		render 'new'
   	end
   end
+
+ 
 
   private
   #ensuring user submits data for the following 4 attributes, no more no less

@@ -6,4 +6,11 @@ class User < ApplicationRecord
 
 	has_secure_password# only requirement to work its magic is to have an attribute called password_digest, must add password _digest column to users table, so need to make another migration
 	validates(:password, presence: true, length:{minimum:6})
+
+	  # Returns the hash digest of the given string.
+  def User.digest(string)
+    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                  BCrypt::Engine.cost
+    BCrypt::Password.create(string, cost: cost)
+  end
 end
