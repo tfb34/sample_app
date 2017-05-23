@@ -7,7 +7,7 @@ class User < ApplicationRecord
 	validates(:email, presence: true, length: {maximum: 255}, format: {with: VALID_EMAIL_REGEX}, uniqueness: {case_sensitive:false})
 
 	has_secure_password# only requirement to work its magic is to have an attribute called password_digest, must add password _digest column to users table, so need to make another migration
-	validates(:password, presence: true, length:{minimum:6})
+	validates(:password, presence: true, length:{minimum:6}, allow_nil: true)
 
 	  # Returns the hash digest of the given string.
   def User.digest(string)
