@@ -10,6 +10,10 @@ class User < ApplicationRecord
 
 	has_secure_password# only requirement to work its magic is to have an attribute called password_digest, must add password _digest column to users table, so need to make another migration
 	validates(:password, presence: true, length:{minimum:6}, allow_nil: true)
+  
+  #this association indicates that each instance of the model has 0+ instances of another model
+  #has_many :posts
+  has_many :microposts, dependent: :destroy
 
 	  # Returns the hash digest of the given string.
   def User.digest(string)
@@ -74,6 +78,12 @@ class User < ApplicationRecord
 # Returns true if a password reset has expired.
   def password_reset_expired?
     reset_sent_at < 2.hours.ago # reads as password reset sent earlier than 2 hours ago
+  end
+
+  #Defines a proto-feed
+  #see "following users" for the full implementation
+  def feed
+    Micropost.where("user_id = ?", id)
   end
 
   private
