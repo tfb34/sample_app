@@ -14,6 +14,10 @@ class User < ApplicationRecord
   #this association indicates that each instance of the model has 0+ instances of another model
   #has_many :posts
   has_many :microposts, dependent: :destroy
+  has_many :active_relationships, class_name: "Relationship", foreign_key: "follower_id", dependent: :destroy
+  has_many :passive_relationships, class_name: "Relationship",foreign_key: "followed_id", dependent: :destroy
+  has_many :following, through: :active_relationships, source: :followed
+  has_many :followers, through: :passive_relationships 
 
 	  # Returns the hash digest of the given string.
   def User.digest(string)
@@ -83,7 +87,29 @@ class User < ApplicationRecord
   #Defines a proto-feed
   #see "following users" for the full implementation
   def feed
-    Micropost.where("user_id = ?", id)
+    following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
+    #Micropost.where("user_id IN (:following_ids) OR user_id = :user_id", following_ids: following_ids,user_id: id)
+    Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id", user_id: id)
+  end
+
+  #Follows a user.
+  def follow(other_user)
+    active_relationships.create(followed_id: other_user.id)
+  end
+
+  #unfollows a user
+  def unfollow(other_user)
+    following.delete(other_user)
+  end
+
+  #Returns true if current user is following the other user.
+  def following?(other_user)
+    following.include?(other_user)
+  end
+
+  #Returns true if a password reset has expired.
+  def password_reset_expired?
+    reset_sent_at < 2.hours.ago
   end
 
   private
